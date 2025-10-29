@@ -38,11 +38,19 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response): Prom
     // Build filter conditions
     const conditions = [];
     
-    if (status) {
-      conditions.push(eq(tasks.status, status as string));
+    if (status && typeof status === 'string') {
+      // Type guard for status enum
+      const validStatuses = ['todo', 'in_progress', 'review', 'done'] as const;
+      if (validStatuses.includes(status as any)) {
+        conditions.push(eq(tasks.status, status as typeof validStatuses[number]));
+      }
     }
-    if (priority) {
-      conditions.push(eq(tasks.priority, priority as string));
+    if (priority && typeof priority === 'string') {
+      // Type guard for priority enum
+      const validPriorities = ['low', 'medium', 'high', 'critical'] as const;
+      if (validPriorities.includes(priority as any)) {
+        conditions.push(eq(tasks.priority, priority as typeof validPriorities[number]));
+      }
     }
     if (projectId) {
       conditions.push(eq(tasks.projectId, parseInt(projectId as string)));
